@@ -17,7 +17,8 @@ func main() {
 
 	mux := http.NewServeMux()
 	mux.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
-		slog.Debug("main", "method", r.Method, "url", r.URL.String(), "remote", r.RemoteAddr)
+		XForwardedFor := r.Header.Get("X-Forwarded-For")
+		slog.Debug("main", "method", r.Method, "url", r.URL.String(), "remote", r.RemoteAddr, "X-Forwarded-For", XForwardedFor)
 		mux2 := http.NewServeMux()
 		mux2 = Route(mux2)
 		mux2.ServeHTTP(w, r)
@@ -25,6 +26,6 @@ func main() {
 	// 這裡的 Route 是在 route.go 中定義的函數
 
 	// 在這邊已明文聆聽 HTTP 埠口 8080
-	http.ListenAndServe("0.0.0.0:8083", Route(mux))
+	http.ListenAndServe("0.0.0.0:8083", mux)
 
 }
