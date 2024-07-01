@@ -14,6 +14,7 @@ func Route(w http.ResponseWriter, r *http.Request) {
 	slog.Debug("activitypub.Route", "request", r.URL.String())
 	mux := http.NewServeMux()
 	mux.HandleFunc("GET /.activitypub/actor/{actor}", RouteActor)
+	mux.HandleFunc("GET /.activitypub/actor/{actor}/inbox", RouteActorInbox)
 
 	mux.ServeHTTP(w, r)
 }
