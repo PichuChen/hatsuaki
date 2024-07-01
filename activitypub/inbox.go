@@ -9,19 +9,10 @@ import (
 	"github.com/pichuchen/hatsuaki/datastore/config"
 )
 
-// 這邊會接收所有 /.activitypub/ 開頭的請求
-func Route(w http.ResponseWriter, r *http.Request) {
-	slog.Debug("activitypub.Route", "request", r.URL.String())
-	mux := http.NewServeMux()
-	mux.HandleFunc("GET /.activitypub/actor/{actor}", RouteActor)
-
-	mux.ServeHTTP(w, r)
-}
-
 // 這邊會接收所有 /.activitypub/actor 開頭的請求
 // 舉例來說會像是 GET /.activitypub/actor/alice
-func RouteActor(w http.ResponseWriter, r *http.Request) {
-	slog.Debug("activitypub.RouteActor", "request", r.URL.String())
+func RouteActorInbox(w http.ResponseWriter, r *http.Request) {
+	slog.Debug("activitypub.RouteActorInbox", "request", r.URL.String())
 
 	username := r.PathValue("actor")
 	a, err := actor.FindActorByUsername(username)
