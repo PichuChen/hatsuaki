@@ -1,0 +1,441 @@
+
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="UTF-8" />
+        <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+        <link rel="stylesheet" href="/assets/tocas/tocas.min.css" />
+        <!-- <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet" /> -->
+        <title>動態時軸 - Tocas UI</title>
+        <style type="text/css">
+            .navbar .item {
+                font-size: 22px;
+                padding-left: 3rem;
+                padding-right: 3rem;
+            }
+            .navbar .item:not(.is-active) {
+                opacity: 0.5;
+            }
+        </style>
+    </head>
+    <body>
+        <div class="ts-app-layout is-full is-vertical">
+            <div class="cell is-secondary is-fluid is-scrollable">
+                <div class="ts-container has-vertically-spaced-large">
+                    <div class="ts-grid is-relaxed">
+                        <div class="column is-3-wide">
+                            <div style="position: sticky; top: 1rem">
+                                <div class="ts-divider is-section"></div>
+                                <div class="ts-wrap is-middle-aligned">
+                                    <div class="ts-avatar is-circular">
+                                        <img src="./../assets/images/user.png" />
+                                    </div>
+                                    <div class="ts-text is-heavy">Yami Odymel</div>
+                                </div>
+                                <div class="ts-divider is-section"></div>
+                                <div class="ts-menu is-start-icon is-separated">
+                                    <a href="#!" class="item"> <span class="ts-icon is-user-group-icon"></span> 朋友 </a>
+                                    <div class="ts-divider"></div>
+                                    <a class="item"> <span class="ts-icon is-gear-icon"></span> 設定 </a>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="column is-9-wide">
+                            <div class="ts-segment">
+                                <div class="ts-grid">
+                                    <div class="column">
+                                        <div class="ts-avatar is-large is-circular">
+                                            <img src="./../assets/images/user.png" />
+                                        </div>
+                                    </div>
+                                    <div class="column is-fluid">
+                                        <div class="ts-input">
+                                            <textarea rows="5"></textarea>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="ts-divider is-section"></div>
+                                <div class="ts-grid is-evenly-divided">
+                                    <div class="column">
+                                        <button class="ts-button is-dense is-start-icon is-ghost is-fluid">
+                                            <span class="ts-icon is-image-icon"></span>
+                                            照片 / 多媒體
+                                        </button>
+                                    </div>
+                                    <div class="column">
+                                        <button class="ts-button is-dense is-start-icon is-ghost is-fluid">
+                                            <span class="ts-icon is-users-icon"></span>
+                                            標記好友
+                                        </button>
+                                    </div>
+                                    <div class="column">
+                                        <button class="ts-button is-dense is-start-icon is-ghost is-fluid">
+                                            <span class="ts-icon is-face-smile-icon"></span>
+                                            感受 / 活動
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                            <div id="timeline">
+                                <div class="ts-segment has-top-spaced">
+                                    <div class="ts-grid">
+                                        <div class="column">
+                                            <div class="ts-avatar is-large is-circular">
+                                                <img class="author-avator" src="./../assets/images/user.png" />
+                                            </div>
+                                        </div>
+                                        <div class="column is-fluid">
+                                            <div style="line-height: 1.5">
+                                                <div class="ts-text is-heavy author-name">Yami Odymel</div>
+                                                <div class="ts-meta is-small is-secondary">
+                                                    <div class="item privacy-setting"><span class="ts-icon is-earth-asia-icon is-end-spaced"></span>公開</div>
+                                                    <a href="#!" class="item created-time">3 分鐘前</a>
+                                                </div>
+                                            </div>
+                                            <div class="content has-vertically-spaced-small">
+                                                Ken Wong 沒事推什麼 King Exit 的坑，<br />
+                                                要是我 TeaMeow 今年寫不出來，<br />
+                                                就是你給我的精神攻擊害的
+                                            </div>
+                                            <div class="attachment">
+                                                <div class="ts-image is-rounded">
+                                                    <img src="./../assets/images/16-9.png" />
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="ts-divider is-section"></div>
+                                    <div class="ts-grid is-evenly-divided">
+                                        <div class="column">
+                                            <button class="ts-button is-dense is-start-icon is-ghost is-fluid">
+                                                <span class="reaction-button ts-icon is-thumbs-up-icon is-regular"></span>
+                                                讚
+                                            </button>
+                                        </div>
+                                        <div class="column">
+                                            <button class="ts-button is-dense is-start-icon is-ghost is-fluid">
+                                                <span class="comment-button ts-icon is-comment-icon is-regular"></span>
+                                                留言
+                                            </button>
+                                        </div>
+                                        <div class="column">
+                                            <button class="ts-button is-dense is-start-icon is-ghost is-fluid">
+                                                <span class="share-button ts-icon is-share-from-square-icon is-regular"></span>
+                                                分享
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="column is-4-wide">
+                            <div class="ts-segment">
+                                <div class="ts-header is-heavy">限時動態</div>
+                                <div class="ts-wrap has-top-spaced">
+                                    <div class="ts-avatar is-large is-circular">
+                                        <img src="./../assets/images/user.png" />
+                                    </div>
+                                    <div class="ts-avatar is-large is-circular">
+                                        <img src="./../assets/images/user.png" />
+                                    </div>
+                                    <div class="ts-avatar is-large is-circular">
+                                        <img src="./../assets/images/user.png" />
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="ts-meta is-small is-secondary is-center-aligned has-top-spaced-small">
+                                <a href="https://github.com/teacat/tocas" class="item" target="_blank">TocasUI</a>
+                                <a href="https://github.com/PichuChen/hatsuaki" class="item" target="_blank">初秋</a>
+                                <!-- <a href="#!" class="item">協助工具</a>
+                                <a href="#!" class="item">廣告資訊</a> -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </body>
+    {{template "script"}}
+</html>
+
+{{define "script"}}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // loadTimeline();
+    // get path
+    var path = window.location.pathname;
+    if (path.startsWith('/@')) {
+        // load user timeline
+        var resourceID = path.split('/')[1];
+        // resourceID example: @pichu@pichuchen.tw
+        console.log('Resource ID:', resourceID);
+        const sep = '@';
+        var parts = resourceID.split(sep);
+        var username = parts[1];
+        if (parts.length <= 2) {
+            // local user
+        }else{
+            // remote user
+            const domain = parts[2];
+            if (resourceID.startsWith('@')) {
+                resourceID = resourceID.substring(1);
+            }
+            loadWebfinger(domain, "acct:" + resourceID)
+            .then((data) => {
+                const links = data.links;
+                var link = "";
+                for (var i = 0; i < links.length; i++) {
+                    if (links[i].rel == 'self') {
+                        link = links[i].href;
+                        break;
+                    }
+                }
+                console.log('activitypub link:', link);
+                return loadActorInfo(link);
+            })
+            .then((data) => {
+                // 當 Threads.net 找不到使用者時，會回應 {"success":false,"error":"Not Found"}
+                if (data.success == false) {
+                    console.error('Error:', data.error);
+                    alert('Error: ' + data.error);
+                    return;
+                }
+                var outbox = data.outbox;
+                console.log("outbox", outbox);
+                return loadOutbox(outbox);
+            })
+            .then((data) => {
+                var first = data.first;
+                console.log("first", first);
+                return loadOutbox(first);
+            })
+            .then((data) => {
+                console.log("first", data);
+                var timeline = document.getElementById('timeline');
+                data.orderedItems.forEach(function(item) {
+                    var object = item.object;
+                    if (object.type != 'Note') {
+                        console.log('Skip:', object.type);
+                        return;
+                    }
+                    loadActorInfo(object.attributedTo);
+                    var card = getNoteCard(object);
+                    timeline.appendChild(card);
+                });
+            })
+            .catch((error) => {
+                console.error('Error:', error);
+            });
+
+        }
+
+    }
+
+});
+
+var cachedWebfinger = {};
+
+async function loadWebfinger(domain, resourceID) {
+    if (cachedWebfinger[resourceID]) {
+        return cachedWebfinger[resourceID];
+    }
+
+    var p = new URLSearchParams();
+    p.append('resource', resourceID);
+    requestURL = "https://" + domain + "/.well-known/webfinger?" + p.toString();
+
+    var p2 = new URLSearchParams();
+    p2.append('url', requestURL);
+
+    return fetch('/fetcher?' + p2.toString(), {
+        method: 'GET',
+        headers: {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json',
+        },
+    })
+    .then(response => response.json())
+    .then(data => {
+        console.log("loadWebfinger", data);
+        // Cache webfinger data
+        cachedWebfinger[resourceID] = data;
+        return data;
+    });
+}
+
+var cachedActorInfo = {};
+
+async function loadActorInfo(url) {
+    if (cachedActorInfo[url]) {
+        return cachedActorInfo[url];
+    }
+
+
+    var p = new URLSearchParams();
+    p.append('url', url);
+
+    return fetch('/fetcher?' + p.toString(), {
+        method: 'GET',
+        headers: {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json',
+        },
+    })
+    .then(response => response.json())
+    .then(data => {
+        console.log("loadActorInfo", data);
+        // Cache actor info
+        cachedActorInfo[url] = data;
+        return data;
+    })
+    .catch((error) => {
+        console.error('Error:', error);
+    });
+
+}
+
+async function loadOutbox(url) {
+    var p = new URLSearchParams();
+    p.append('url', url);
+
+    return fetch('/fetcher?' + p.toString(), {
+        method: 'GET',
+        headers: {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json',
+        },
+    })
+    .then(response => response.json())
+    .then(data => {
+        console.log("loadOutbox", data);
+        return data;
+    })
+    .catch((error) => {
+        console.error('Error:', error);
+    });
+
+}
+
+async function loadOutboxFirst(url) {
+    var p = new URLSearchParams();
+    p.append('url', url);
+
+    return fetch('/fetcher?' + p.toString(), {
+        method: 'GET',
+        headers: {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json',
+        },
+    })
+    .then(response => response.json())
+    .then(data => {
+        console.log("loadOutboxFirst", data);
+        return data;
+    })
+    .catch((error) => {
+        console.error('Error:', error);
+    });
+
+}
+
+function loadTimeline() {
+    url = "https://misskey.io/users/9hhm2yztxi/outbox?page=true";
+    var p = new URLSearchParams();
+    p.append('url', url);
+
+    fetch('/fetcher?' + p.toString(), {
+        method: 'GET',
+        headers: {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json',
+        },
+    })
+    .then(response => response.json())
+    .then(data => {
+
+        var timeline = document.getElementById('timeline');
+        // timeline.innerHTML = '';
+        console.log(data);
+        data.orderedItems.forEach(function(item) {
+            var object = item.object;
+            if (object.type != 'Note') {
+                console.log('Skip:', object.type);
+                return;
+            }
+            loadActorInfo(object.attributedTo);
+            var card = getNoteCard(object);
+            timeline.appendChild(card);
+
+
+        });
+    })
+    .catch((error) => {
+        console.error('Error:', error);
+    });
+
+
+}
+
+
+function getNoteCard(object) {
+    var card = document.createElement('div');
+    card.classList.add('ts-segment');
+    card.classList.add('has-top-spaced');
+
+    console.log(object.attributedTo);
+    const author = cachedActorInfo[object.attributedTo];
+    const avatarUrl = author.icon?.url || './../assets/images/user.png';
+    const username = author.preferredUsername || 'Unknown';
+    const createdAt = object.published || 'Unknown';
+
+    card.innerHTML = `
+        <div class="ts-grid">
+            <div class="column">
+                <div class="ts-avatar is-large is-circular">
+                    <img class="author-avator" src="${avatarUrl}" />
+                </div>
+            </div>
+            <div class="column is-fluid">
+                <div style="line-height: 1.5">
+                    <div class="ts-text is-heavy author-name">${username}</div>
+                    <div class="ts-meta is-small is-secondary">
+                        <div class="item privacy-setting"><span class="ts-icon is-earth-asia-icon is-end-spaced"></span>公開</div>
+                        <a href="#!" class="item created-time">${createdAt}</a>
+                    </div>
+                </div>
+                <div class="content has-vertically-spaced-small">
+                    ${object.content}
+                </div>
+                <div class="attachment">
+                </div>
+            </div>
+        </div>
+        <div class="ts-divider is-section"></div>
+        <div class="ts-grid is-evenly-divided">
+            <div class="column">
+                <button class="ts-button is-dense is-start-icon is-ghost is-fluid">
+                    <span class="reaction-button ts-icon is-thumbs-up-icon is-regular"></span>
+                    讚
+                </button>
+            </div>
+            <div class="column">
+                <button class="ts-button is-dense is-start-icon is-ghost is-fluid">
+                    <span class="comment-button ts-icon is-comment-icon is-regular"></span>
+                    留言
+                </button>
+            </div>
+            <div class="column">
+                <button class="ts-button is-dense is-start-icon is-ghost is-fluid">
+                    <span class="share-button ts-icon is-share-from-square-icon is-regular"></span>
+                    分享
+                </button>
+            </div>
+        </div>
+    `;
+    return card;
+
+
+}
+
+</script>
+{{end}}
