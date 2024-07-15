@@ -31,7 +31,9 @@ jobs:
       uses: actions/upload-artifact@v2
       with:
         name: serverlet
-        
+        path: serverlet/serverlet
+
+
       
   # release:
   #   needs: build
