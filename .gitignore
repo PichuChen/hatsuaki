@@ -1,2 +1,4 @@
 serverlet/serverlet
 *.swp
+serverlet/actor.json
+serverlet/config.json
