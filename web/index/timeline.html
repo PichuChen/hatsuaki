@@ -396,51 +396,55 @@ function getNoteCard(object) {
     const createdAt = object.published || 'Unknown';
 
     card.innerHTML = `
-        <div class="ts-grid">
-            <div class="column">
-                <div class="ts-image is-circular">
-                    <img class="author-avator" src="${avatarUrl}" />
-                </div>
-            </div>
-            <div class="column is-fluid">
-                <div style="line-height: 1.5">
-                    <div class="ts-text is-heavy author-name">${username}</div>
-                    <div class="ts-meta is-small is-secondary">
-                        <div class="item privacy-setting"><span class="ts-icon is-earth-asia-icon is-end-spaced"></span>公開</div>
-                        <a href="#!" class="item created-time">${createdAt}</a>
+        <div class="ts-content">
+            <div class="ts-grid">
+                <div class="column">
+                    <div class="ts-image is-circular">
+                        <img class="author-avator" src="${avatarUrl}"  width="48"/>
                     </div>
                 </div>
-                <div class="content has-vertically-spaced-small">
-                    ${object.content}
+                <div class="column is-fluid">
+                    <div style="line-height: 1.5">
+                        <div class="ts-text is-heavy author-name">${username}</div>
+                        <div class="ts-meta is-small is-secondary">
+                            <div class="item privacy-setting"><span class="ts-icon is-earth-asia-icon is-end-spaced"></span>公開</div>
+                            <a href="#!" class="item created-time">${createdAt}</a>
+                        </div>
+                    </div>
+                    <div class="content has-vertically-spaced-small">
+                        ${object.content}
+                    </div>
+                    <div class="attachment has-hidden">
+                        <div class="ts-image is-rounded">
+                            <img src="./../assets/images/16-9.png" />
+                        </div>
+                    </div>
                 </div>
-                <div class="attachment">
+            </div>
+            <div class="ts-divider is-section"></div>
+            <div class="ts-grid is-evenly-divided">
+                <div class="column">
+                    <button class="ts-button is-dense is-start-icon is-ghost is-fluid">
+                        <span class="reaction-button ts-icon is-thumbs-up-icon is-regular"></span>
+                        讚
+                    </button>
                 </div>
-            </div>
-        </div>
-        <div class="ts-divider is-section"></div>
-        <div class="ts-grid is-evenly-divided">
-            <div class="column">
-                <button class="ts-button is-dense is-start-icon is-ghost is-fluid">
-                    <span class="reaction-button ts-icon is-thumbs-up-icon is-regular"></span>
-                    讚
-                </button>
-            </div>
-            <div class="column">
-                <button class="ts-button is-dense is-start-icon is-ghost is-fluid">
-                    <span class="comment-button ts-icon is-comment-icon is-regular"></span>
-                    留言
-                </button>
-            </div>
-            <div class="column">
-                <button class="ts-button is-dense is-start-icon is-ghost is-fluid">
-                    <span class="share-button ts-icon is-share-from-square-icon is-regular"></span>
-                    分享
-                </button>
+                <div class="column">
+                    <button class="ts-button is-dense is-start-icon is-ghost is-fluid">
+                        <span class="comment-button ts-icon is-comment-icon is-regular"></span>
+                        留言
+                    </button>
+                </div>
+                <div class="column">
+                    <button class="ts-button is-dense is-start-icon is-ghost is-fluid">
+                        <span class="share-button ts-icon is-share-from-square-icon is-regular"></span>
+                        分享
+                    </button>
+                </div>
             </div>
         </div>
     `;
     return card;
-
 
 }
 
