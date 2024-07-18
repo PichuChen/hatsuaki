@@ -19,16 +19,16 @@
         </style>
     </head>
     <body>
-        <div class="ts-app-layout is-full is-vertical">
-            <div class="cell is-secondary is-fluid is-scrollable">
+        <div class="ts-app-layout is-fullscreen is-vertical">
+            <div class="cell">
                 <div class="ts-container has-vertically-spaced-large">
                     <div class="ts-grid is-relaxed">
                         <div class="column is-3-wide">
                             <div style="position: sticky; top: 1rem">
                                 <div class="ts-divider is-section"></div>
                                 <div class="ts-wrap is-middle-aligned">
-                                    <div class="ts-avatar is-circular">
-                                        <img src="./../assets/images/user.png" />
+                                    <div class="ts-image is-circular">
+                                        <img src="./../assets/images/user.png" width="32" />
                                     </div>
                                     <div class="ts-text is-heavy">來賓</div>
                                 </div>
@@ -41,66 +41,17 @@
                             </div>
                         </div>
                         <div class="column is-9-wide">
-                            <div class="ts-segment">
-                                <div class="ts-grid">
-                                    <div class="column">
-                                        <div class="ts-avatar is-large is-circular">
-                                            <img src="./../assets/images/user.png" />
-                                        </div>
-                                    </div>
-                                    <div class="column is-fluid">
-                                        <div class="ts-input">
-                                            <textarea rows="5"></textarea>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="ts-divider is-section"></div>
-                                <div class="ts-grid is-evenly-divided">
-                                    <div class="column">
-                                        <button class="ts-button is-dense is-start-icon is-ghost is-fluid">
-                                            <span class="ts-icon is-image-icon"></span>
-                                            照片 / 多媒體
-                                        </button>
-                                    </div>
-                                    <div class="column">
-                                        <button class="ts-button is-dense is-start-icon is-ghost is-fluid">
-                                            <span class="ts-icon is-users-icon"></span>
-                                            標記好友
-                                        </button>
-                                    </div>
-                                    <div class="column">
-                                        <button class="ts-button is-dense is-start-icon is-ghost is-fluid">
-                                            <span class="ts-icon is-face-smile-icon"></span>
-                                            感受 / 活動
-                                        </button>
-                                    </div>
-                                </div>
-                            </div>
-                            <div id="timeline">
-                                <div class="ts-segment has-top-spaced">
+                            <div class="ts-box">
+                                <div class="ts-content">
                                     <div class="ts-grid">
                                         <div class="column">
-                                            <div class="ts-avatar is-large is-circular">
-                                                <img class="author-avator" src="./../assets/images/user.png" />
+                                            <div class="ts-image is-circular">
+                                                <img src="./../assets/images/user.png"  width="48" />
                                             </div>
                                         </div>
                                         <div class="column is-fluid">
-                                            <div style="line-height: 1.5">
-                                                <div class="ts-text is-heavy author-name">Yami Odymel</div>
-                                                <div class="ts-meta is-small is-secondary">
-                                                    <div class="item privacy-setting"><span class="ts-icon is-earth-asia-icon is-end-spaced"></span>公開</div>
-                                                    <a href="#!" class="item created-time">3 分鐘前</a>
-                                                </div>
-                                            </div>
-                                            <div class="content has-vertically-spaced-small">
-                                                Ken Wong 沒事推什麼 King Exit 的坑，<br />
-                                                要是我 TeaMeow 今年寫不出來，<br />
-                                                就是你給我的精神攻擊害的
-                                            </div>
-                                            <div class="attachment">
-                                                <div class="ts-image is-rounded">
-                                                    <img src="./../assets/images/16-9.png" />
-                                                </div>
+                                            <div class="ts-input">
+                                                <textarea rows="5"></textarea>
                                             </div>
                                         </div>
                                     </div>
@@ -108,38 +59,93 @@
                                     <div class="ts-grid is-evenly-divided">
                                         <div class="column">
                                             <button class="ts-button is-dense is-start-icon is-ghost is-fluid">
-                                                <span class="reaction-button ts-icon is-thumbs-up-icon is-regular"></span>
-                                                讚
+                                                <span class="ts-icon is-image-icon"></span>
+                                                照片 / 多媒體
                                             </button>
                                         </div>
                                         <div class="column">
                                             <button class="ts-button is-dense is-start-icon is-ghost is-fluid">
-                                                <span class="comment-button ts-icon is-comment-icon is-regular"></span>
-                                                留言
+                                                <span class="ts-icon is-users-icon"></span>
+                                                標記好友
                                             </button>
                                         </div>
                                         <div class="column">
                                             <button class="ts-button is-dense is-start-icon is-ghost is-fluid">
-                                                <span class="share-button ts-icon is-share-from-square-icon is-regular"></span>
-                                                分享
+                                                <span class="ts-icon is-face-smile-icon"></span>
+                                                感受 / 活動
                                             </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div id="timeline">
+                                <div class="ts-box has-top-spaced">
+                                    <div class="ts-content">
+                                        <div class="ts-grid">
+                                            <div class="column">
+                                                <div class="ts-image is-circular">
+                                                    <img class="author-avator" src="./../assets/images/user.png"  width="48"/>
+                                                </div>
+                                            </div>
+                                            <div class="column is-fluid">
+                                                <div style="line-height: 1.5">
+                                                    <div class="ts-text is-heavy author-name">Yami Odymel</div>
+                                                    <div class="ts-meta is-small is-secondary">
+                                                        <div class="item privacy-setting"><span class="ts-icon is-earth-asia-icon is-end-spaced"></span>公開</div>
+                                                        <a href="#!" class="item created-time">3 分鐘前</a>
+                                                    </div>
+                                                </div>
+                                                <div class="content has-vertically-spaced-small">
+                                                    Ken Wong 沒事推什麼 King Exit 的坑，<br />
+                                                    要是我 TeaMeow 今年寫不出來，<br />
+                                                    就是你給我的精神攻擊害的
+                                                </div>
+                                                <div class="attachment">
+                                                    <div class="ts-image is-rounded">
+                                                        <img src="./../assets/images/16-9.png" />
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="ts-divider is-section"></div>
+                                        <div class="ts-grid is-evenly-divided">
+                                            <div class="column">
+                                                <button class="ts-button is-dense is-start-icon is-ghost is-fluid">
+                                                    <span class="reaction-button ts-icon is-thumbs-up-icon is-regular"></span>
+                                                    讚
+                                                </button>
+                                            </div>
+                                            <div class="column">
+                                                <button class="ts-button is-dense is-start-icon is-ghost is-fluid">
+                                                    <span class="comment-button ts-icon is-comment-icon is-regular"></span>
+                                                    留言
+                                                </button>
+                                            </div>
+                                            <div class="column">
+                                                <button class="ts-button is-dense is-start-icon is-ghost is-fluid">
+                                                    <span class="share-button ts-icon is-share-from-square-icon is-regular"></span>
+                                                    分享
+                                                </button>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
                         <div class="column is-4-wide">
-                            <div class="ts-segment">
-                                <div class="ts-header is-heavy">限時動態</div>
-                                <div class="ts-wrap has-top-spaced">
-                                    <div class="ts-avatar is-large is-circular">
-                                        <img src="./../assets/images/user.png" />
-                                    </div>
-                                    <div class="ts-avatar is-large is-circular">
-                                        <img src="./../assets/images/user.png" />
-                                    </div>
-                                    <div class="ts-avatar is-large is-circular">
-                                        <img src="./../assets/images/user.png" />
+                            <div class="ts-box">
+                                <div class="ts-content">
+                                    <div class="ts-header is-heavy">限時動態</div>
+                                    <div class="ts-wrap has-top-spaced">
+                                        <div class="ts-image is-circular">
+                                            <img src="./../assets/images/user.png" width="48"/>
+                                        </div>
+                                        <div class="ts-image is-circular">
+                                            <img src="./../assets/images/user.png" width="48"/>
+                                        </div>
+                                        <div class="ts-image is-circular">
+                                            <img src="./../assets/images/user.png" width="48"/>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -380,7 +386,7 @@ function loadTimeline() {
 
 function getNoteCard(object) {
     var card = document.createElement('div');
-    card.classList.add('ts-segment');
+    card.classList.add('ts-box');
     card.classList.add('has-top-spaced');
 
     console.log(object.attributedTo);
@@ -392,7 +398,7 @@ function getNoteCard(object) {
     card.innerHTML = `
         <div class="ts-grid">
             <div class="column">
-                <div class="ts-avatar is-large is-circular">
+                <div class="ts-image is-circular">
                     <img class="author-avator" src="${avatarUrl}" />
                 </div>
             </div>
