@@ -30,7 +30,7 @@
                                     <div class="ts-avatar is-circular">
                                         <img src="./../assets/images/user.png" />
                                     </div>
-                                    <div class="ts-text is-heavy">Yami Odymel</div>
+                                    <div class="ts-text is-heavy">來賓</div>
                                 </div>
                                 <div class="ts-divider is-section"></div>
                                 <div class="ts-menu is-start-icon is-separated">
@@ -212,6 +212,7 @@ document.addEventListener('DOMContentLoaded', function() {
             .then((data) => {
                 console.log("first", data);
                 var timeline = document.getElementById('timeline');
+                timeline.innerHTML = '';
                 data.orderedItems.forEach(function(item) {
                     var object = item.object;
                     if (object.type != 'Note') {
@@ -354,7 +355,7 @@ function loadTimeline() {
     .then(data => {
 
         var timeline = document.getElementById('timeline');
-        // timeline.innerHTML = '';
+        timeline.innerHTML = '';
         console.log(data);
         data.orderedItems.forEach(function(item) {
             var object = item.object;

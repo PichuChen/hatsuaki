@@ -1,21 +1,83 @@
 package actor
 
 import (
+	"encoding/json"
 	"fmt"
 	"log/slog"
+	"os"
 	"sync"
+
+	"github.com/pichuchen/hatsuaki/activitypub/signature"
 )
 
 type Actor map[string]interface{}
 
-var datastore = sync.Map{}
+var datastore = &sync.Map{}
 
-func Load() {
+func LoadActor(filepath string) error {
 	slog.Debug("actor.Load", "info", "load actors")
-	datastore.Store("alice", &Actor{"username": "alice"})
-	datastore.Store("bob", &Actor{"username": "bob"})
 
+	f, err := os.ReadFile(filepath)
+	if err != nil {
+		return err
+	}
+
+	tmpMap := map[string]interface{}{}
+	tmpDatastore := sync.Map{}
+
+	err = json.Unmarshal(f, &tmpMap)
+	if err != nil {
+		return err
+	}
+
+	for k, v := range tmpMap {
+		m := v.(map[string]interface{})
+		a := Actor(m)
+		tmpDatastore.Store(k, &a)
+	}
+
+	if _, ok := tmpDatastore.Load("instance.actor"); !ok {
+		// 如果讀取了檔案，但是裡面卻沒有 instance.actor 的話 (可能被刪掉了)
+		// initial instance.actor
+		InitActorDatastore()
+	}
+	// old datastore should be garbage collected
+	datastore = &tmpDatastore
 	slog.Info("actor.Load", "info", "actors loaded")
+	return nil
+}
+
+func SaveActor(filepath string) error {
+	slog.Debug("actor.Save", "info", "save actors")
+
+	tmpMap := map[string]interface{}{}
+	datastore.Range(func(k, v interface{}) bool {
+		tmpMap[k.(string)] = v
+		return true
+	})
+
+	f, err := json.MarshalIndent(tmpMap, "", "  ")
+	if err != nil {
+		return err
+	}
+
+	err = os.WriteFile(filepath, f, 0644)
+	if err != nil {
+		return err
+	}
+
+	slog.Info("actor.Save", "info", "actors saved")
+	return nil
+}
+
+func InitActorDatastore() {
+	if datastore == nil {
+		datastore = &sync.Map{}
+	}
+	datastore.Store("instance.actor", &Actor{
+		"username":   "instance.actor",
+		"privateKey": signature.GeneratePrivateKey(),
+	})
 }
 
 func FindActorByUsername(username string) (actor *Actor, err error) {
@@ -29,4 +91,22 @@ func FindActorByUsername(username string) (actor *Actor, err error) {
 
 func (a *Actor) GetUsername() string {
 	return (*a)["username"].(string)
+}
+
+// 會以 PEM 格式回傳 RSA Private Key
+func (a *Actor) GetPrivateKey() string {
+	key, ok := (*a)["privateKey"].(string)
+	if !ok {
+		slog.Warn("actor.GetPrivateKey", "error", "privateKey not found")
+		// 我們在這邊產生一個新的
+		key = signature.GeneratePrivateKey()
+		(*a)["privateKey"] = key
+	}
+	return key
+}
+
+// 會以 PEM 格式回傳 RSA Public Key
+func (a *Actor) GetPublicKey() string {
+	p := a.GetPrivateKey()
+	return string(signature.Pubout([]byte(p)))
 }

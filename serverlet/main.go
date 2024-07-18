@@ -1,10 +1,13 @@
 package main
 
 import (
+	"errors"
 	"log/slog"
 	"net/http"
+	"os"
 
 	"github.com/pichuchen/hatsuaki/datastore/actor"
+	"github.com/pichuchen/hatsuaki/datastore/config"
 )
 
 // 這個檔案的用途是整個系統的最初進入點
@@ -12,8 +15,32 @@ import (
 
 func main() {
 	slog.SetLogLoggerLevel(slog.LevelDebug)
+	var err error
 
-	actor.Load()
+	// 檢查 config.json 是否存在，如果不存在就建立一個新的
+	// 如果存在就讀取進來
+	err = config.LoadConfig("./config.json")
+	if errors.Is(err, os.ErrNotExist) {
+		slog.Info("main", "config", "config.json not found, creating a new one")
+		err = config.SaveConfig("./config.json")
+		if err != nil {
+			slog.Error("main", "error", err)
+		}
+	} else if err != nil {
+		slog.Error("main", "error", err)
+	}
+
+	err = actor.LoadActor("./actor.json")
+	if errors.Is(err, os.ErrNotExist) {
+		slog.Info("main", "actor", "actor.json not found, creating a new one")
+		actor.InitActorDatastore()
+		err = actor.SaveActor("./actor.json")
+		if err != nil {
+			slog.Error("main", "error", err)
+		}
+	} else if err != nil {
+		slog.Error("main", "error", err)
+	}
 
 	mux := http.NewServeMux()
 	mux.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {

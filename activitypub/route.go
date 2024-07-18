@@ -73,6 +73,14 @@ func RouteActor(w http.ResponseWriter, r *http.Request) {
 	endpoints["sharedInbox"] = "https://" + config.GetDomain() + "/.activitypub/inbox"
 	m["endpoints"] = endpoints
 
+	// 如果伺服器會有需要跟隨或是被跟隨的話，那就需要有 publicKey 項目
+	publicKey := map[string]string{}
+	publicKey["id"] = baseURL + "#main-key"
+	publicKey["owner"] = baseURL
+	publicKey["publicKeyPem"] = a.GetPublicKey()
+
+	m["publicKey"] = publicKey
+
 	// 此處請依照喜好自由加入。
 	// m["published"] = "2023-01-01T00:00:00Z"
 	// m["icon"] = nil
