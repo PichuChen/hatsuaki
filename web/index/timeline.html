@@ -34,7 +34,8 @@
                                 </div>
                                 <div class="ts-divider is-section"></div>
                                 <div class="ts-menu is-start-icon is-separated">
-                                    <a href="#!" class="item"> <span class="ts-icon is-user-group-icon"></span> 朋友 </a>
+                                    <a href="#!" class="item"> <span class="ts-icon is-user-group-icon"></span> 登入 </a>
+                                    <a href="#!" id="register" class="item"> <span class="ts-icon is-user-group-icon"></span> 註冊 </a>
                                     <div class="ts-divider"></div>
                                     <a class="item"> <span class="ts-icon is-gear-icon"></span> 設定 </a>
                                 </div>
@@ -162,10 +163,23 @@
         </div>
     </body>
     {{template "script"}}
+    {{template "register-dialog"}}
 </html>
 
 {{define "script"}}
 <script>
+
+// 註冊對話框聆聽
+document.addEventListener('DOMContentLoaded', function() {
+    var registerButton = document.getElementById('register');
+    var dialog = document.getElementById('register-dialog');
+
+    registerButton.addEventListener('click', function() {
+        dialog.showModal();
+    });
+});
+
+
 document.addEventListener('DOMContentLoaded', function() {
     // loadTimeline();
     // get path
@@ -448,5 +462,97 @@ function getNoteCard(object) {
 
 }
 
+</script>
+{{end}}
+
+
+{{define "register-dialog"}}
+<dialog class="ts-modal" id="register-dialog">
+    <div class="content">
+        <form>
+        <div class="ts-content">
+            <div class="ts-header">註冊使用者</div>
+        </div>
+        <div class="ts-divider"></div>
+        <div class="ts-content">
+                <div class="ts-input">
+                    <input type="text" autocomplete="username" id="new-username" placeholder="使用者名稱" />
+                </div>
+
+
+                <!-- 
+                這個部分每個平台會有自己的真人驗證方式，例如信箱或是手機號碼，
+                因為這邊是測試用的平台，因此不進行任何真人驗證。
+                
+                但是在未來由於架設新的聯邦站點有可能會越來越簡單，甚至有可能發生被入侵的電腦自動產生假帳號四處發送廣告留言的情況。
+                因此註冊方式過於鬆散的站點很有可能不被信任，因此難以在在沒有任何跟隨關係的文章中進行留言。
+                -->
+                <!-- <div class="ts-input">
+                    <input type="email" placeholder="電子郵件" />
+                </div> -->
+
+                <div class="ts-input has-top-spaced-small">
+                    <input type="password" autocomplete="new-password" id="new-passwod" placeholder="密碼" />
+                </div>
+                <div class="ts-input has-top-spaced-small">
+                    <input type="password" autocomplete="new-password" id="retype-passwod" placeholder="確認密碼" />
+                </div>
+        </div>
+        <div class="ts-divider"></div>
+        <div class="ts-content">
+            <div class="actions">
+                <button class="ts-button is-primary" id="reaction-button-register">註冊</button>
+                <button class="ts-button" id="reaction-button-cancel">取消</button>
+            </div>
+        </div>
+    </form>
+    </div>
+</dialog>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    var dialog = document.getElementById('register-dialog');
+    var registerButton = document.getElementById('reaction-button-register');
+    var cancelButton = document.getElementById('reaction-button-cancel');
+
+    registerButton.addEventListener('click', function(e) {
+        e.preventDefault();
+
+        var username = document.getElementById('new-username').value;
+        var password = document.getElementById('new-passwod').value;
+
+        params = new URLSearchParams();
+        params.append('username', username);
+        params.append('password', password);
+
+        fetch('/1/register', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+                'Accept': 'application/json',
+            },
+            body: params.toString(),
+        })
+        .then(response => response.json())
+        .then(data => {
+            console.log(data);
+            if (data.success) {
+                alert('註冊成功');
+                dialog.close();
+            }else{
+                alert('註冊失敗: ' + data.error);
+            }
+        })
+        .catch((error) => {
+            console.error('Error:', error);
+            alert('註冊失敗: ' + error);
+        });
+    });
+
+    cancelButton.addEventListener('click', function(e) {
+        e.preventDefault();
+        
+        dialog.close();
+    });
+});
 </script>
 {{end}}

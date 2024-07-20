@@ -8,6 +8,7 @@ import (
 	"sync"
 
 	"github.com/pichuchen/hatsuaki/activitypub/signature"
+	"golang.org/x/crypto/bcrypt"
 )
 
 type Actor map[string]interface{}
@@ -48,7 +49,7 @@ func LoadActor(filepath string) error {
 }
 
 func SaveActor(filepath string) error {
-	slog.Debug("actor.Save", "info", "save actors")
+	slog.Debug("actor.Save", "info", "save actors", "filepath", filepath)
 
 	tmpMap := map[string]interface{}{}
 	datastore.Range(func(k, v interface{}) bool {
@@ -109,4 +110,28 @@ func (a *Actor) GetPrivateKey() string {
 func (a *Actor) GetPublicKey() string {
 	p := a.GetPrivateKey()
 	return string(signature.Pubout([]byte(p)))
+}
+
+func NewActor(username string) *Actor {
+	a := &Actor{
+		"username":   username,
+		"privateKey": signature.GeneratePrivateKey(),
+	}
+	datastore.Store(username, a)
+	return a
+}
+
+func UpdatePassword(username, password string) error {
+	a, err := FindActorByUsername(username)
+	if err != nil {
+		slog.Error("actor.UpdatePassword", "error", err)
+		return err
+	}
+	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
+	if err != nil {
+		slog.Error("actor.UpdatePassword", "error", err)
+		return err
+	}
+	(*a)["hashedPassword"] = string(hashedPassword)
+	return nil
 }
