@@ -135,3 +135,22 @@ func UpdatePassword(username, password string) error {
 	(*a)["hashedPassword"] = string(hashedPassword)
 	return nil
 }
+
+func VerifyPassword(username, password string) error {
+	a, err := FindActorByUsername(username)
+	if err != nil {
+		slog.Error("actor.VerifyPassword", "error", err)
+		return err
+	}
+	hashedPassword, ok := (*a)["hashedPassword"].(string)
+	if !ok {
+		slog.Error("actor.VerifyPassword", "error", "hashedPassword not found")
+		return fmt.Errorf("hashedPassword not found")
+	}
+	err = bcrypt.CompareHashAndPassword([]byte(hashedPassword), []byte(password))
+	if err != nil {
+		slog.Error("actor.VerifyPassword", "error", err)
+		return err
+	}
+	return nil
+}

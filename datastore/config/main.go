@@ -7,13 +7,22 @@ import (
 
 type Config struct {
 	// Domain 是這個服務的域名，舉例來說 @alice@example.com 的 domain 就是 example.com
-	Domain string `json:"domain"`
+	Domain         string `json:"domain"`
+	LoginJWTSecret string `json:"login_jwt_secret"`
 }
 
 var runningConfig Config
 
 func GetDomain() string {
 	return runningConfig.Domain
+}
+
+func GetLoginJWTSecret() string {
+	return runningConfig.LoginJWTSecret
+}
+
+func SetLoginJWTSecret(secret string) {
+	runningConfig.LoginJWTSecret = secret
 }
 
 func LoadConfig(filepath string) error {

@@ -28,6 +28,9 @@ func RoutePost(w http.ResponseWriter, r *http.Request) {
 	if r.URL.Path == "/1/register" {
 		PostRegister(w, r)
 		return
+	} else if r.URL.Path == "/1/login" {
+		PostLogin(w, r)
+		return
 	}
 	http.Error(w, "Method Not Allowed", http.StatusMethodNotAllowed)
 }
@@ -71,4 +74,46 @@ func PostRegister(w http.ResponseWriter, r *http.Request) {
 		"success": true,
 	}
 	json.NewEncoder(w).Encode(m)
+}
+
+func PostLogin(w http.ResponseWriter, r *http.Request) {
+	slog.Info("api.PostLogin", "info", "login")
+	r.ParseForm()
+	username := r.FormValue("username")
+	if username == "" {
+		slog.Warn("api.PostLogin", "warn", "username is empty")
+		http.Error(w, "Bad Request", http.StatusBadRequest)
+		return
+	}
+	password := r.FormValue("password")
+	if password == "" {
+		slog.Warn("api.PostLogin", "warn", "password is empty")
+		http.Error(w, "Bad Request", http.StatusBadRequest)
+		return
+	}
+
+	_, err := actor.FindActorByUsername(username)
+	if err != nil {
+		http.Error(w, "Not Found", http.StatusNotFound)
+		return
+	}
+
+	if err = actor.VerifyPassword(username, password); err != nil {
+		http.Error(w, "Unauthorized", http.StatusUnauthorized)
+		return
+	}
+
+	token, err := IssueJWT(username)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	w.WriteHeader(http.StatusOK)
+	m := map[string]interface{}{
+		"success": true,
+		"token":   token,
+	}
+	json.NewEncoder(w).Encode(m)
+
 }

@@ -30,11 +30,11 @@
                                     <div class="ts-image is-circular">
                                         <img src="./../assets/images/user.png" width="32" />
                                     </div>
-                                    <div class="ts-text is-heavy">來賓</div>
+                                    <div class="ts-text is-heavy" id="current_username">來賓</div>
                                 </div>
                                 <div class="ts-divider is-section"></div>
                                 <div class="ts-menu is-start-icon is-separated">
-                                    <a href="#!" class="item"> <span class="ts-icon is-user-group-icon"></span> 登入 </a>
+                                    <a href="#!" id="login" class="item"> <span class="ts-icon is-user-group-icon"></span> 登入 </a>
                                     <a href="#!" id="register" class="item"> <span class="ts-icon is-user-group-icon"></span> 註冊 </a>
                                     <div class="ts-divider"></div>
                                     <a class="item"> <span class="ts-icon is-gear-icon"></span> 設定 </a>
@@ -163,6 +163,7 @@
         </div>
     </body>
     {{template "script"}}
+    {{template "login-dialog"}}
     {{template "register-dialog"}}
 </html>
 
@@ -178,6 +179,24 @@ document.addEventListener('DOMContentLoaded', function() {
         dialog.showModal();
     });
 });
+
+// 登入對話框聆聽
+document.addEventListener('DOMContentLoaded', function() {
+    var loginButton = document.getElementById('login');
+    var dialog = document.getElementById('login-dialog');
+
+    loginButton.addEventListener('click', function() {
+        dialog.showModal();
+    });
+});
+
+
+document.addEventListener('DOMContentLoaded', function() {
+    if (localStorage.getItem('current_username') != null) {
+        document.getElementById('current_username').innerText = localStorage.getItem('current_username');
+    }
+});
+        
 
 
 document.addEventListener('DOMContentLoaded', function() {
@@ -463,6 +482,85 @@ function getNoteCard(object) {
 }
 
 </script>
+{{end}}
+
+{{define "login-dialog"}}
+<dialog class="ts-modal" id="login-dialog">
+    <div class="content">
+        <form>
+        <div class="ts-content">
+            <div class="ts-header">登入</div>
+        </div>
+        <div class="ts-divider"></div>
+        <div class="ts-content">
+                <div class="ts-input">
+                    <input type="text" autocomplete="username" id="username" placeholder="使用者名稱" />
+                </div>
+                <div class="ts-input has-top-spaced-small">
+                    <input type="password" autocomplete="current-password" id="password" placeholder="密碼" />
+                </div>
+        </div>
+        <div class="ts-divider"></div>
+        <div class="ts-content">
+            <div class="actions">
+                <button class="ts-button is-primary" id="login-button-login">登入</button>
+                <button class="ts-button" id="login-button-cancel">取消</button>
+            </div>
+        </div>
+    </form>
+    </div>
+</dialog>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    var dialog = document.getElementById('login-dialog');
+    var loginButton = document.getElementById('login-button-login');
+    var cancelButton = document.getElementById('login-button-cancel');
+
+    loginButton.addEventListener('click', function(e) {
+        e.preventDefault();
+
+        var username = document.getElementById('username').value;
+        var password = document.getElementById('password').value;
+
+        params = new URLSearchParams();
+        params.append('username', username);
+        params.append('password', password);
+
+        fetch('/1/login', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+                'Accept': 'application/json',
+            },
+            body: params.toString(),
+        })
+        .then(response => response.json())
+        .then(data => {
+            console.log(data);
+            if (data.success) {
+                alert('登入成功');
+                token = data.token;
+                localStorage.setItem('token', token);
+                localStorage.setItem('current_username', username);
+                dialog.close();
+            }else{
+                alert('登入失敗: ' + data.error);
+            }
+        })
+        .catch((error) => {
+            console.error('Error:', error);
+            alert('登入失敗: ' + error);
+        });
+    });
+
+    cancelButton.addEventListener('click', function(e) {
+        e.preventDefault();
+        
+        dialog.close();
+    });
+});
+</script>
+
 {{end}}
 
 

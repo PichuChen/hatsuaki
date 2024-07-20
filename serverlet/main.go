@@ -1,6 +1,8 @@
 package main
 
 import (
+	"crypto/rand"
+	"encoding/base64"
 	"errors"
 	"log/slog"
 	"net/http"
@@ -28,6 +30,20 @@ func main() {
 		}
 	} else if err != nil {
 		slog.Error("main", "error", err)
+	}
+
+	if config.GetLoginJWTSecret() == "" {
+		// 產生 256bit 的隨機字串
+		key := make([]byte, 32)
+		_, err = rand.Read(key)
+		if err != nil {
+			slog.Error("main", "error", err)
+		}
+		config.SetLoginJWTSecret(base64.StdEncoding.EncodeToString(key))
+		err = config.SaveConfig("./config.json")
+		if err != nil {
+			slog.Error("main", "error", err)
+		}
 	}
 
 	err = actor.LoadActor("./actor.json")
