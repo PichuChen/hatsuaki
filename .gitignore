@@ -2,3 +2,4 @@ serverlet/serverlet
 *.swp
 serverlet/actor.json
 serverlet/config.json
+serverlet/object.json

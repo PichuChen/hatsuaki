@@ -10,6 +10,7 @@ import (
 
 	"github.com/pichuchen/hatsuaki/datastore/actor"
 	"github.com/pichuchen/hatsuaki/datastore/config"
+	"github.com/pichuchen/hatsuaki/datastore/object"
 )
 
 // 這個檔案的用途是整個系統的最初進入點
@@ -50,6 +51,31 @@ func main() {
 	if errors.Is(err, os.ErrNotExist) {
 		slog.Info("main", "actor", "actor.json not found, creating a new one")
 		actor.InitActorDatastore()
+		err = actor.SaveActor("./actor.json")
+		if err != nil {
+			slog.Error("main", "error", err)
+		}
+	} else if err != nil {
+		slog.Error("main", "error", err)
+	}
+
+	err = object.LoadObject("./object.json")
+	if errors.Is(err, os.ErrNotExist) {
+		slog.Info("main", "object", "object.json not found, creating a new one")
+		n := object.NewNote()
+		a, err := actor.FindActorByUsername("instance.actor")
+		if err != nil {
+			slog.Error("main", "error", err)
+		}
+
+		n.SetContent("Hello, World!")
+		n.SetAttributedTo("https://" + config.GetDomain() + "/.activitypub/actor/instance.actor")
+		a.AppendObject(n.GetID())
+
+		err = object.SaveObject("./object.json")
+		if err != nil {
+			slog.Error("main", "error", err)
+		}
 		err = actor.SaveActor("./actor.json")
 		if err != nil {
 			slog.Error("main", "error", err)

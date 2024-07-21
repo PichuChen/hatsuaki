@@ -9,7 +9,7 @@ import (
 	"github.com/pichuchen/hatsuaki/datastore/config"
 )
 
-// 這邊會接收所有 /.activitypub/actor 開頭的請求
+// 這邊會接收所有 /.activitypub/actor/inbox 開頭的請求
 // 舉例來說會像是 GET /.activitypub/actor/alice
 func RouteActorInbox(w http.ResponseWriter, r *http.Request) {
 	slog.Debug("activitypub.RouteActorInbox", "request", r.URL.String())

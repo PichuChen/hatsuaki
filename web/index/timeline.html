@@ -42,43 +42,7 @@
                             </div>
                         </div>
                         <div class="column is-9-wide">
-                            <div class="ts-box">
-                                <div class="ts-content">
-                                    <div class="ts-grid">
-                                        <div class="column">
-                                            <div class="ts-image is-circular">
-                                                <img src="./../assets/images/user.png"  width="48" />
-                                            </div>
-                                        </div>
-                                        <div class="column is-fluid">
-                                            <div class="ts-input">
-                                                <textarea rows="5"></textarea>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="ts-divider is-section"></div>
-                                    <div class="ts-grid is-evenly-divided">
-                                        <div class="column">
-                                            <button class="ts-button is-dense is-start-icon is-ghost is-fluid">
-                                                <span class="ts-icon is-image-icon"></span>
-                                                照片 / 多媒體
-                                            </button>
-                                        </div>
-                                        <div class="column">
-                                            <button class="ts-button is-dense is-start-icon is-ghost is-fluid">
-                                                <span class="ts-icon is-users-icon"></span>
-                                                標記好友
-                                            </button>
-                                        </div>
-                                        <div class="column">
-                                            <button class="ts-button is-dense is-start-icon is-ghost is-fluid">
-                                                <span class="ts-icon is-face-smile-icon"></span>
-                                                感受 / 活動
-                                            </button>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
+                            {{template "create-note-box" .}}
                             <div id="timeline">
                                 <div class="ts-box has-top-spaced">
                                     <div class="ts-content">
@@ -653,4 +617,93 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 });
 </script>
+{{end}}
+
+{{define "create-note-box"}}
+<div id="create-note-box" class="ts-box has-hidden">
+    <div class="ts-content">
+        <div class="ts-grid">
+            <div class="column">
+                <div class="ts-image is-circular">
+                    <img src="./../assets/images/user.png"  width="48" />
+                </div>
+            </div>
+            <div class="column is-fluid">
+                <div class="ts-input">
+                    <textarea rows="5" id="new-content"></textarea>
+                </div>
+            </div>
+        </div>
+        <div class="ts-divider is-section"></div>
+        <div class="ts-grid is-evenly-divided">
+            <div class="column">
+                <button class="ts-button is-dense is-start-icon is-ghost is-fluid">
+                    <span class="ts-icon is-image-icon"></span>
+                    照片 / 多媒體
+                </button>
+            </div>
+            <div class="column">
+                <button class="ts-button is-dense is-start-icon is-ghost is-fluid">
+                    <span class="ts-icon is-users-icon"></span>
+                    標記好友
+                </button>
+            </div>
+            <div class="column">
+                <button id="create-note-button" class="ts-button is-dense is-start-icon is-ghost is-fluid">
+                    <span class="ts-icon is-seedling-icon"></span>
+                    發文
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+
+
+function canPost() {
+    return localStorage.getItem('current_username') != null;
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+    var createNoteBox = document.getElementById('create-note-box');
+    var createNoteButton = document.getElementById('create-note-button');
+    if (canPost()) {
+        createNoteBox.classList.remove('has-hidden');
+    }else{
+        console.log('Can not post');
+    }
+    createNoteButton.addEventListener('click', function() {
+        var content = document.getElementById('new-content').value;
+        var username = localStorage.getItem('current_username');
+        var token = localStorage.getItem('token');
+        var params = new URLSearchParams();
+        params.append('content', content);
+
+        fetch('/1/note', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+                'Accept': 'application/json',
+                'Authorization': 'Bearer ' + token,
+            },
+            body: params.toString(),
+        })
+        .then(response => response.json())
+        .then(data => {
+            console.log(data);
+            if (data.success) {
+                alert('發文成功');
+                loadTimeline();
+            }else{
+                alert('發文失敗: ' + data.error);
+            }
+        })
+        
+    });
+});
+
+
+</script>
+
+
 {{end}}
