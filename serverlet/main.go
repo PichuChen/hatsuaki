@@ -70,7 +70,7 @@ func main() {
 
 		n.SetContent("Hello, World!")
 		n.SetAttributedTo("https://" + config.GetDomain() + "/.activitypub/actor/instance.actor")
-		a.AppendObject(n.GetID())
+		a.AppendOutboxObject(n.GetID())
 
 		err = object.SaveObject("./object.json")
 		if err != nil {

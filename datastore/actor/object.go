@@ -1,7 +1,7 @@
 package actor
 
-func (a *Actor) GetObjects() ([]string, error) {
-	n, ok := (*a)["objects"]
+func (a *Actor) GetOutboxObjects() ([]string, error) {
+	n, ok := (*a)["outbox"]
 	if !ok {
 		return []string{}, nil
 	}
@@ -14,8 +14,8 @@ func (a *Actor) GetObjects() ([]string, error) {
 	return objects, nil
 }
 
-func (a *Actor) GetObjectsCount() int {
-	objects, err := a.GetObjects()
+func (a *Actor) GetOutboxObjectsCount() int {
+	objects, err := a.GetOutboxObjects()
 	if err != nil {
 		return 0
 	}
@@ -23,12 +23,12 @@ func (a *Actor) GetObjectsCount() int {
 	return len(objects)
 }
 
-func (a *Actor) AppendObject(objectID string) {
-	objects, err := a.GetObjects()
+func (a *Actor) AppendOutboxObject(objectID string) {
+	objects, err := a.GetOutboxObjects()
 	if err != nil {
 		objects = []string{}
 	}
 
 	objects = append(objects, objectID)
-	(*a)["objects"] = objects
+	(*a)["outbox"] = objects
 }

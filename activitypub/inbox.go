@@ -9,6 +9,8 @@ import (
 	"github.com/pichuchen/hatsuaki/datastore/config"
 )
 
+// 相關文件請參閱: https://www.w3.org/TR/activitypub/#inbox
+
 // 這邊會接收所有 /.activitypub/actor/inbox 開頭的請求
 // 舉例來說會像是 GET /.activitypub/actor/alice
 func RouteActorInbox(w http.ResponseWriter, r *http.Request) {
@@ -22,6 +24,21 @@ func RouteActorInbox(w http.ResponseWriter, r *http.Request) {
 		json.NewEncoder(w).Encode(map[string]string{"error": "actor not found"})
 		return
 	}
+
+	if r.Method == "GET" {
+		// GET 的狀況通常是該使用者想要查看自己的 inbox
+		GetActorInbox(w, r, a)
+		return
+	} else if r.Method == "POST" {
+		// POST 的狀況通常是有人想要發送訊息給該使用者，值得一提的是。
+		PostActorInbox(w, r, a)
+		return
+	} else {
+		http.Error(w, "Method Not Allowed", http.StatusMethodNotAllowed)
+
+	}
+}
+func GetActorInbox(w http.ResponseWriter, r *http.Request, a *actor.Actor) {
 
 	w.Header().Set("Content-Type", "application/activity+json")
 	m := map[string]interface{}{}
@@ -72,6 +89,22 @@ func RouteActorInbox(w http.ResponseWriter, r *http.Request) {
 	// m["manuallyApprovesFollowers"] = false
 	// m["discoverable"] = true
 	// m["summary"] = "test"
+
+	json.NewEncoder(w).Encode(m)
+}
+
+func PostActorInbox(w http.ResponseWriter, r *http.Request, a *actor.Actor) {
+	slog.Info("activitypub.PostActorInbox", "info", "inbox")
+
+	// 這邊是在 ActivityPub 中的必要 (MUST) 欄位
+	w.Header().Set("Content-Type", "application/activity+json")
+
+	// 這邊是在 ActivityPub 中的必要 (MUST) 欄位
+	m := map[string]interface{}{}
+	m["id"] = "https://" + config.GetDomain() + "/.activitypub/actor/" + a.GetUsername() + "/inbox"
+
+	// 這邊是在 ActivityPub 中的必要 (MUST) 欄位
+	m["type"] = "OrderedCollection"
 
 	json.NewEncoder(w).Encode(m)
 }

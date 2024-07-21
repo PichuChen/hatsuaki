@@ -8,6 +8,7 @@ import (
 	"sync"
 
 	"github.com/pichuchen/hatsuaki/activitypub/signature"
+	"github.com/pichuchen/hatsuaki/datastore/config"
 	"golang.org/x/crypto/bcrypt"
 )
 
@@ -92,6 +93,10 @@ func FindActorByUsername(username string) (actor *Actor, err error) {
 
 func (a *Actor) GetUsername() string {
 	return (*a)["username"].(string)
+}
+
+func (a *Actor) GetFullID() string {
+	return fmt.Sprintf("https://" + config.GetDomain() + "/.activitypub/actor/" + a.GetUsername())
 }
 
 // 會以 PEM 格式回傳 RSA Private Key

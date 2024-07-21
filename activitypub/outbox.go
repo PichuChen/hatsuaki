@@ -10,6 +10,8 @@ import (
 	"github.com/pichuchen/hatsuaki/datastore/object"
 )
 
+// 相關文件請參閱: https://www.w3.org/TR/activitypub/#outbox
+
 // 這邊會接收所有 /.activitypub/actor/{actor}/outbox 開頭的請求
 // 舉例來說會像是 GET /.activitypub/actor/alice/outbox
 // Outbox 的用途是讓沒有收到先前消息的人可以查詢某個 Actor 的所有發送過的消息。
@@ -48,7 +50,7 @@ func RouteActorOutbox(w http.ResponseWriter, r *http.Request) {
 	// 這邊是在 ActivityPub 中的必要 (MUST) 欄位
 	m["id"] = id
 	m["type"] = "OrderedCollection"
-	m["totalItems"] = a.GetObjectsCount()
+	m["totalItems"] = a.GetOutboxObjectsCount()
 	m["first"] = id + "?page=true"
 	m["last"] = id + "?page=true"
 
@@ -72,11 +74,11 @@ func RouteActorOutboxPage(w http.ResponseWriter, r *http.Request, a *actor.Actor
 	// 這邊是在 ActivityPub 中的必要 (MUST) 欄位
 	m["id"] = id
 	m["type"] = "OrderedCollection"
-	m["totalItems"] = a.GetObjectsCount()
+	m["totalItems"] = a.GetOutboxObjectsCount()
 	m["first"] = id + "?page=true"
 	m["last"] = id + "?page=true"
 
-	objectIDs, err := a.GetObjects()
+	objectIDs, err := a.GetOutboxObjects()
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		json.NewEncoder(w).Encode(map[string]string{"error": "internal server error"})

@@ -693,7 +693,7 @@ document.addEventListener('DOMContentLoaded', function() {
             console.log(data);
             if (data.success) {
                 alert('發文成功');
-                loadTimeline();
+                location.reload();
             }else{
                 alert('發文失敗: ' + data.error);
             }
