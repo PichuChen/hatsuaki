@@ -13,12 +13,19 @@ import (
 	"github.com/pichuchen/hatsuaki/datastore/object"
 )
 
+var (
+	GitCommitHash string = "unknown"
+	BuildTime     string = "unknown"
+)
+
 // 這個檔案的用途是整個系統的最初進入點
 // 包括聆聽 HTTP 埠口以及呼叫 router 的功能
 
 func main() {
 	slog.SetLogLoggerLevel(slog.LevelDebug)
 	var err error
+	// 顯示編譯的 Build Time
+	slog.Info("main", "build_time", BuildTime, "git_commit_hash", GitCommitHash)
 
 	// 檢查 config.json 是否存在，如果不存在就建立一個新的
 	// 如果存在就讀取進來

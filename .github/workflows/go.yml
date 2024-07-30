@@ -44,7 +44,10 @@ jobs:
         go-version: '1.22'
 
     - name: Build
-      run: cd serverlet ; go build -v
+      run: |
+        BUILD_TIME=`date -u '+%Y-%m-%d_%H:%M:%S'`
+        COMMIT_HASH=`git rev-parse --short HEAD`
+        go build -v -ldflags "-s -w -X 'main.BuildTime=$BUILD_TIME' -X 'main.CommitHash=$COMMIT_HASH'" -o serverlet serverlet
 
     - name: Test
       run: go test -v ./...
