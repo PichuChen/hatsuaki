@@ -45,9 +45,9 @@ jobs:
 
     - name: Build
       run: |
-        BUILD_TIME=`date -u '+%Y-%m-%d_%H:%M:%S'`
-        COMMIT_HASH=`git rev-parse --short HEAD`
-        go build -v -ldflags "-s -w -X 'main.BuildTime=$BUILD_TIME' -X 'main.CommitHash=$COMMIT_HASH'" -o serverlet serverlet
+        BUILD_TIME=`date -u '+%Y-%m-%d_%H:%M:%S'` 
+        COMMIT_HASH=`git rev-parse --short HEAD` 
+        cd serverlet ; go build -v -ldflags "-s -w -X 'main.BuildTime=$BUILD_TIME' -X 'main.GitCommitHash=$COMMIT_HASH'" 
 
     - name: Test
       run: go test -v ./...
