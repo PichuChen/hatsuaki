@@ -7,8 +7,11 @@ import (
 	"log/slog"
 	"math/big"
 	"os"
+	"strings"
 	"sync"
 	"time"
+
+	"github.com/pichuchen/hatsuaki/datastore/config"
 )
 
 type Object map[string]interface{}
@@ -67,9 +70,13 @@ func SaveObject(filepath string) error {
 }
 
 func FindObjectByID(id string) (*Object, error) {
+	domainPrefix := "https://" + config.GetDomain() + "/.activitypub/object/"
+	id = strings.TrimPrefix(id, domainPrefix)
+
 	if v, ok := datastore.Load(id); ok {
 		return v.(*Object), nil
 	}
+
 	return nil, fmt.Errorf("object not found")
 }
 
