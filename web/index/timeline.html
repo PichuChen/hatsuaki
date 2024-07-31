@@ -164,7 +164,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
 
 document.addEventListener('DOMContentLoaded', function() {
-    // loadTimeline();
+    
     // get path
     var path = window.location.pathname;
     if (path.startsWith('/@')) {
@@ -233,6 +233,9 @@ document.addEventListener('DOMContentLoaded', function() {
 
         }
 
+    }else{
+        // load home timeline
+        loadTimeline();
     }
 
 });
@@ -343,7 +346,7 @@ async function loadOutboxFirst(url) {
 }
 
 function loadTimeline() {
-    url = "https://misskey.io/users/9hhm2yztxi/outbox?page=true";
+    url = "https://hatsuaki-dev2.pichucen.tw/.activitypub/actor/pichu/inbox";
     var p = new URLSearchParams();
     p.append('url', url);
 

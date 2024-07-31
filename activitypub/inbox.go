@@ -2,6 +2,7 @@ package activitypub
 
 import (
 	"encoding/json"
+	"fmt"
 	"log/slog"
 	"net/http"
 
@@ -30,7 +31,7 @@ func RouteActorInbox(w http.ResponseWriter, r *http.Request) {
 		GetActorInbox(w, r, a)
 		return
 	} else if r.Method == "POST" {
-		// POST 的狀況通常是有人想要發送訊息給該使用者，值得一提的是。
+		// POST 的狀況通常是有人想要發送訊息給該使用者。
 		PostActorInbox(w, r, a)
 		return
 	} else {
@@ -38,14 +39,33 @@ func RouteActorInbox(w http.ResponseWriter, r *http.Request) {
 
 	}
 }
+
+func RouteSharedInbox(w http.ResponseWriter, r *http.Request) {
+	slog.Debug("activitypub.RouteSharedInbox", "request", r.URL.String())
+
+	if r.Method == "POST" {
+		// POST 的狀況通常是有人想要發送訊息給該使用者。
+		PostSharedInbox(w, r)
+		return
+	} else {
+		http.Error(w, "Method Not Allowed", http.StatusMethodNotAllowed)
+	}
+}
+
 func GetActorInbox(w http.ResponseWriter, r *http.Request, a *actor.Actor) {
 
 	w.Header().Set("Content-Type", "application/activity+json")
 	m := map[string]interface{}{}
 
-	// 在 JSON-LD 的回應中分為兩個大部分，@context 和其他的
-	// @context 理論上是必須，但是實際上實作中大家通常都不會去讀取他，所以比較偏向會給工程師除錯用的。
-	// 另外如果在 JSON 中有新增自己站自定義的欄位時，請記得補充 context 內容。
+	// 這個部分需要驗證進行取 inbox 的人必須要是該使用者
+
+	page := r.URL.Query().Get("page")
+	if page == "true" {
+		// 如果有 page=true 的參數，則回傳一個 OrderedCollection
+		// 這個 OrderedCollection 會包含所有的 Object
+		RouteActoInboxPage(w, r, a)
+		return
+	}
 
 	c := []interface{}{}
 
@@ -54,47 +74,72 @@ func GetActorInbox(w http.ResponseWriter, r *http.Request, a *actor.Actor) {
 	c = append(c, "https://w3id.org/security/v1")
 	m["@context"] = c
 
-	baseURL := "https://" + config.GetDomain() + "/.activitypub/actor/" + a.GetUsername()
+	id := "https://" + config.GetDomain() + "/.activitypub/actor/" + a.GetUsername() + "/inbox"
 
-	// All objects must have an id and type property
-	m["id"] = baseURL
-	m["type"] = "Person"
-
-	// 接下來是在 ActivityPub 中的必要 (MUST) 欄位
-	m["inbox"] = baseURL + "/inbox"
-	m["outbox"] = baseURL + "/outbox"
-
-	// 這邊是在 ActivityPub 中的應該 (SHOULD) 欄位
-	m["following"] = baseURL + "/following"
-	m["followers"] = baseURL + "/followers"
-
-	// 這邊是在 ActivityPub 中的也許 (MAY) 欄位
-	m["liked"] = baseURL + "/liked"
-	// m["streams"] = baseURL + "/streams"
-	// 在 misskey 2024.05 之前的版本，沒有 perferredUsername 會造成更新錯誤。
-	m["preferredUsername"] = a.GetUsername()
-
-	endpoints := map[string]string{}
-	// 有 sharedInbox 的話，可以講低同個 instance follow 同個外部使用者時的訊息量。
-	// 另外在 misskey 2024.05 之前的版本，沒有 sharedInbox 會造成更新錯誤。
-	endpoints["sharedInbox"] = "https://" + config.GetDomain() + "/.activitypub/inbox"
-	m["endpoints"] = endpoints
-
-	// 此處請依照喜好自由加入。
-	// m["published"] = "2023-01-01T00:00:00Z"
-	// m["icon"] = nil
-	// m["image"] = nil
-	// m["url"] = baseURL
-	// m["name"] = a.GetUsername()
-	// m["manuallyApprovesFollowers"] = false
-	// m["discoverable"] = true
-	// m["summary"] = "test"
+	// 這邊是在 ActivityPub 中的必要 (MUST) 欄位
+	m["id"] = id
+	m["type"] = "OrderedCollection"
+	m["totalItems"] = a.GetInboxObjectsCount()
+	m["first"] = id + "?page=true"
+	m["last"] = id + "?page=true"
 
 	json.NewEncoder(w).Encode(m)
 }
 
+func RouteActoInboxPage(w http.ResponseWriter, r *http.Request, a *actor.Actor) {
+	w.Header().Set("Content-Type", "application/activity+json")
+	m := map[string]interface{}{}
+
+	c := []interface{}{}
+	c = append(c, "https://www.w3.org/ns/activitystreams")
+	c = append(c, "https://w3id.org/security/v1")
+	m["@context"] = c
+
+	id := "https://" + config.GetDomain() + "/.activitypub/actor/" + a.GetUsername() + "/inbox"
+
+	// 這邊是在 ActivityPub 中的必要 (MUST) 欄位
+	m["id"] = id
+	m["type"] = "OrderedCollection"
+	m["totalItems"] = a.GetInboxObjectsCount()
+	m["first"] = id + "?page=true"
+	m["last"] = id + "?page=true"
+
+	objectIDs, err := a.GetOutboxObjects()
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		json.NewEncoder(w).Encode(map[string]string{"error": "internal server error"})
+		return
+	}
+	orderedItems := []interface{}{}
+	for _, oid := range objectIDs {
+		orderedItems = append(orderedItems, map[string]interface{}{"id": oid})
+	}
+	m["orderedItems"] = orderedItems
+
+	json.NewEncoder(w).Encode(m)
+
+}
+
 func PostActorInbox(w http.ResponseWriter, r *http.Request, a *actor.Actor) {
 	slog.Info("activitypub.PostActorInbox", "info", "inbox")
+
+	// 解碼送入的 JSON
+	var requestMap map[string]interface{}
+	err := json.NewDecoder(r.Body).Decode(&requestMap)
+	if err != nil {
+		slog.Warn("activitypub.PostActorInbox", "error", err)
+		w.WriteHeader(http.StatusBadRequest)
+		json.NewEncoder(w).Encode(map[string]string{"error": "bad request"})
+		return
+	}
+
+	requestType := requestMap["type"].(string)
+	if requestType == "Follow" {
+		PostActorInboxFollow(w, r, a, requestMap)
+		return
+	}
+
+	slog.Debug("activitypub.PostActorInbox", "info", requestMap)
 
 	// 這邊是在 ActivityPub 中的必要 (MUST) 欄位
 	w.Header().Set("Content-Type", "application/activity+json")
@@ -102,6 +147,104 @@ func PostActorInbox(w http.ResponseWriter, r *http.Request, a *actor.Actor) {
 	// 這邊是在 ActivityPub 中的必要 (MUST) 欄位
 	m := map[string]interface{}{}
 	m["id"] = "https://" + config.GetDomain() + "/.activitypub/actor/" + a.GetUsername() + "/inbox"
+
+	// 這邊是在 ActivityPub 中的必要 (MUST) 欄位
+	m["type"] = "OrderedCollection"
+
+	json.NewEncoder(w).Encode(m)
+}
+
+func PostActorInboxFollow(w http.ResponseWriter, r *http.Request, a *actor.Actor, requestMap map[string]interface{}) {
+	slog.Info("activitypub.PostActorInboxFollow", "info", "follow")
+
+	// 這邊是在 ActivityPub 中的必要 (MUST) 欄位
+	w.Header().Set("Content-Type", "application/activity+json")
+
+	// 這邊是在 ActivityPub 中的必要 (MUST) 欄位
+	m := map[string]interface{}{}
+	m["id"] = "https://" + config.GetDomain() + "/.activitypub/actor/" + a.GetUsername() + "/inbox"
+
+	// 這邊是在 ActivityPub 中的必要 (MUST) 欄位
+	m["type"] = "OrderedCollection"
+
+	json.NewEncoder(w).Encode(m)
+}
+
+func PostSharedInbox(w http.ResponseWriter, r *http.Request) {
+	slog.Info("activitypub.PostSharedInbox", "info", "shared inbox")
+
+	// 解碼送入的 JSON
+	var requestMap map[string]interface{}
+	err := json.NewDecoder(r.Body).Decode(&requestMap)
+	if err != nil {
+		slog.Warn("activitypub.PostSharedInbox", "error", err)
+		w.WriteHeader(http.StatusBadRequest)
+		json.NewEncoder(w).Encode(map[string]string{"error": "bad request"})
+		return
+	}
+
+	requestType := requestMap["type"].(string)
+	if requestType == "Create" {
+		PostSharedInboxCreate(w, r, requestMap)
+		return
+	}
+
+	slog.Debug("activitypub.PostSharedInbox", "info", requestMap)
+
+	// 這邊是在 ActivityPub 中的必要 (MUST) 欄位
+	w.Header().Set("Content-Type", "application/activity+json")
+
+	// 這邊是在 ActivityPub 中的必要 (MUST) 欄位
+	m := map[string]interface{}{}
+	m["id"] = "https://" + config.GetDomain() + "/.activitypub/inbox"
+
+	// 這邊是在 ActivityPub 中的必要 (MUST) 欄位
+	m["type"] = "OrderedCollection"
+
+	json.NewEncoder(w).Encode(m)
+}
+
+func PostSharedInboxCreate(w http.ResponseWriter, r *http.Request, requestMap map[string]interface{}) {
+	slog.Info("activitypub.PostSharedInboxCreate", "info", "create", "requestMap", requestMap)
+
+	encoded, _ := json.MarshalIndent(requestMap, "", "  ")
+	slog.Debug("activitypub.PostSharedInboxCreate", "info", "create", "encoded", string(encoded))
+	fmt.Printf("%s\n", string(encoded))
+
+	o := requestMap["object"].(map[string]interface{})
+	oid := o["id"].(string)
+	// 這邊需要驗證 oid 的 id 是否和簽署的 key 的 domain 相同
+	// 在這邊的驗證我們沒辦法信任來源 IP, 能信任的只有簽發的 Key 而已。
+
+	prefix := "https://" + config.GetDomain() + "/.activitypub/actor/"
+	toList := requestMap["to"].([]interface{})
+	for _, v := range toList {
+		to := v.(string)
+		if to[:len(prefix)] != prefix {
+			slog.Warn("activitypub.PostSharedInboxCreate", "skip", "to", "to", to)
+			continue
+		}
+		actorName := to[len(prefix):]
+		a, err := actor.FindActorByUsername(actorName)
+		if err != nil {
+			slog.Warn("activitypub.PostSharedInboxCreate", "error", "actor not found", "actorName", actorName)
+			continue
+		}
+
+		a.AppendInboxObject(oid)
+	}
+
+	err := actor.SaveActor("./actor.json")
+	if err != nil {
+		slog.Warn("activitypub.PostSharedInboxCreate", "error", "actor save error", "err", err)
+	}
+
+	// 這邊是在 ActivityPub 中的必要 (MUST) 欄位
+	w.Header().Set("Content-Type", "application/activity+json")
+
+	// 這邊是在 ActivityPub 中的必要 (MUST) 欄位
+	m := map[string]interface{}{}
+	m["id"] = "https://" + config.GetDomain() + "/.activitypub/inbox"
 
 	// 這邊是在 ActivityPub 中的必要 (MUST) 欄位
 	m["type"] = "OrderedCollection"
