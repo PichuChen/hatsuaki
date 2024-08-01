@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log/slog"
 	"net/http"
+	"time"
 
 	"github.com/pichuchen/hatsuaki/datastore/actor"
 	"github.com/pichuchen/hatsuaki/datastore/config"
@@ -155,19 +156,56 @@ func PostActorInbox(w http.ResponseWriter, r *http.Request, a *actor.Actor) {
 }
 
 func PostActorInboxFollow(w http.ResponseWriter, r *http.Request, a *actor.Actor, requestMap map[string]interface{}) {
-	slog.Info("activitypub.PostActorInboxFollow", "info", "follow")
+	slog.Info("activitypub.PostActorInboxFollow", "info", "follow", "requestMap.object", requestMap["object"])
+	followID := requestMap["id"].(string)
 
-	// 這邊是在 ActivityPub 中的必要 (MUST) 欄位
-	w.Header().Set("Content-Type", "application/activity+json")
+	// 這邊的 objectID 是我們自己站上的 actor 的 ID
+	var objectID string
+	switch o := requestMap["object"].(type) {
+	case string:
+		objectID = o
+	case map[string]interface{}:
+		objectID = o["id"].(string)
+	default:
+		slog.Warn("activitypub.PostActorInboxFollow", "error", "object type error")
+		w.WriteHeader(http.StatusBadRequest)
+		json.NewEncoder(w).Encode(map[string]string{"error": "bad request"})
+		return
+	}
 
-	// 這邊是在 ActivityPub 中的必要 (MUST) 欄位
-	m := map[string]interface{}{}
-	m["id"] = "https://" + config.GetDomain() + "/.activitypub/actor/" + a.GetUsername() + "/inbox"
+	// 檢查 objectID 是否等同於我們自己站上的 actor 的 ID
+	if objectID != a.GetFullID() {
+		slog.Warn("activitypub.PostActorInboxFollow", "error", "objectID not match")
+		w.WriteHeader(http.StatusBadRequest)
+		json.NewEncoder(w).Encode(map[string]string{"error": "bad request"})
+		return
+	}
 
-	// 這邊是在 ActivityPub 中的必要 (MUST) 欄位
-	m["type"] = "OrderedCollection"
+	// 這邊的 actorID 是提出 follow 請求的 actor 的 ID
+	var actorID string
+	switch a := requestMap["actor"].(type) {
+	case string:
+		actorID = a
+	case map[string]interface{}:
+		actorID = a["id"].(string)
+	default:
+		slog.Warn("activitypub.PostActorInboxFollow", "error", "actor type error")
+		w.WriteHeader(http.StatusBadRequest)
+		json.NewEncoder(w).Encode(map[string]string{"error": "bad request"})
+		return
+	}
 
-	json.NewEncoder(w).Encode(m)
+	slog.Info("activitypub.PostActorInboxFollow", "followID", followID)
+
+	if config.GetEnableAutoAcceptFollow() {
+		// 這邊暫停五秒是讓 Debug Log 看起來比較清楚
+		time.Sleep(5 * time.Second)
+		slog.Info("activitypub.PostActorInboxFollow", "info", "auto accept follow")
+		SendAccept(a, actorID, followID)
+		a.AppendFollowerID(actorID)
+		actor.SaveActor("./actor.json")
+	}
+
 }
 
 func PostSharedInbox(w http.ResponseWriter, r *http.Request) {

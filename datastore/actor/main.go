@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log/slog"
 	"os"
+	"strings"
 	"sync"
 
 	"github.com/pichuchen/hatsuaki/activitypub/signature"
@@ -91,6 +92,16 @@ func FindActorByUsername(username string) (actor *Actor, err error) {
 	return nil, fmt.Errorf("actor not found")
 }
 
+func FindActorByFullID(fullID string) (actor *Actor, err error) {
+	slog.Info("actor.FindActorByFullID", "fullID", fullID)
+	prefix := "https://" + config.GetDomain() + "/.activitypub/actor/"
+	if !strings.HasPrefix(fullID, prefix) {
+		return nil, fmt.Errorf("invalid fullID")
+	}
+	username := fullID[len("https://"+config.GetDomain()+"/.activitypub/actor/"):]
+	return FindActorByUsername(username)
+}
+
 func (a *Actor) GetUsername() string {
 	return (*a)["username"].(string)
 }
@@ -158,4 +169,53 @@ func VerifyPassword(username, password string) error {
 		return err
 	}
 	return nil
+}
+
+func (a *Actor) AppendFollowerID(followerID string) {
+	ids := a.GetFollowerIDs()
+	ids = append(ids, followerID)
+	(*a)["followers"] = ids
+}
+
+func (a *Actor) GetFollowerIDs() []string {
+	n, ok := (*a)["followers"]
+	if !ok {
+		return []string{}
+	}
+	switch v := n.(type) {
+	case []string:
+		return v
+	case []interface{}:
+		ids := make([]string, len(v))
+		for i, val := range v {
+			ids[i] = val.(string)
+		}
+		return ids
+	}
+	return []string{}
+}
+
+func (a *Actor) AppendFollowingID(followingID string) {
+	ids := a.GetFollowingIDs()
+	ids = append(ids, followingID)
+	(*a)["following"] = ids
+}
+
+func (a *Actor) GetFollowingIDs() []string {
+	n, ok := (*a)["following"]
+	if !ok {
+		return []string{}
+	}
+	switch v := n.(type) {
+	case []string:
+		return v
+	case []interface{}:
+		ids := make([]string, len(v))
+		for i, val := range v {
+			ids[i] = val.(string)
+		}
+		return ids
+	}
+	return []string{}
+
 }

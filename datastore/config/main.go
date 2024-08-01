@@ -9,6 +9,8 @@ type Config struct {
 	// Domain 是這個服務的域名，舉例來說 @alice@example.com 的 domain 就是 example.com
 	Domain         string `json:"domain"`
 	LoginJWTSecret string `json:"login_jwt_secret"`
+	// The Accept or Reject MAY be generated automatically - https://www.w3.org/TR/activitypub/#follow-activity-inbox
+	EnableAutoAcceptFollow bool `json:"enable_auto_accept_follow"`
 }
 
 var runningConfig Config
@@ -23,6 +25,14 @@ func GetLoginJWTSecret() string {
 
 func SetLoginJWTSecret(secret string) {
 	runningConfig.LoginJWTSecret = secret
+}
+
+func GetEnableAutoAcceptFollow() bool {
+	return runningConfig.EnableAutoAcceptFollow
+}
+
+func SetEnableAutoAcceptFollow(b bool) {
+	runningConfig.EnableAutoAcceptFollow = b
 }
 
 func LoadConfig(filepath string) error {

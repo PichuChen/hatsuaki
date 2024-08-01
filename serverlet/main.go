@@ -48,6 +48,7 @@ func main() {
 			slog.Error("main", "error", err)
 		}
 		config.SetLoginJWTSecret(base64.StdEncoding.EncodeToString(key))
+		config.SetEnableAutoAcceptFollow(true)
 		err = config.SaveConfig("./config.json")
 		if err != nil {
 			slog.Error("main", "error", err)
