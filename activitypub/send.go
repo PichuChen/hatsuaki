@@ -31,6 +31,8 @@ func SendActivity(senderUsername string, recevierActorID string, activity map[st
 		return
 	}
 
+	slog.Info("SendActivity", "activity", string(activityByte), "receiver", recevierActorID)
+
 	req, err := http.NewRequest("POST", inbox, strings.NewReader(string(activityByte)))
 	if err != nil {
 		slog.Error("Create request failed", "error", err)

@@ -5,6 +5,7 @@ import (
 	"log/slog"
 	"net/http"
 
+	"github.com/pichuchen/hatsuaki/activitypub"
 	"github.com/pichuchen/hatsuaki/datastore/actor"
 	"github.com/pichuchen/hatsuaki/datastore/object"
 )
@@ -154,7 +155,11 @@ func PostNote(w http.ResponseWriter, r *http.Request) {
 	o := object.NewNote()
 	o.SetContent(content)
 	o.SetAttributedTo(a.GetFullID())
+	o.AddCC(a.GetFullID() + "/followers")
+	o.AddTo("https://www.w3.org/ns/activitystreams#Public")
 	a.AppendOutboxObject(o.GetFullID())
+
+	activitypub.SendCreate(a, o)
 
 	err = object.SaveObject("./object.json")
 	if err != nil {
