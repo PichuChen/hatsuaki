@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log/slog"
 	"net/http"
+	"strings"
 	"time"
 
 	"github.com/pichuchen/hatsuaki/datastore/actor"
@@ -258,7 +259,7 @@ func PostSharedInboxCreate(w http.ResponseWriter, r *http.Request, requestMap ma
 	toList := requestMap["to"].([]interface{})
 	for _, v := range toList {
 		to := v.(string)
-		if to[:len(prefix)] != prefix {
+		if !strings.HasPrefix(to, prefix) {
 			slog.Warn("activitypub.PostSharedInboxCreate", "skip", "to", "to", to)
 			continue
 		}

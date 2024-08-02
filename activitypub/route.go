@@ -17,6 +17,7 @@ func Route(w http.ResponseWriter, r *http.Request) {
 	mux.HandleFunc("GET /.activitypub/actor/{actor}", RouteActor)
 	mux.HandleFunc("/.activitypub/actor/{actor}/inbox", RouteActorInbox)
 	mux.HandleFunc("GET /.activitypub/actor/{actor}/outbox", RouteActorOutbox)
+	mux.HandleFunc("GET /.activitypub/object/{object}", RouteObject)
 
 	mux.ServeHTTP(w, r)
 }

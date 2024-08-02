@@ -31,6 +31,10 @@ func (o *Object) GetID() string {
 	return (*o)["id"].(string)
 }
 
+func (o *Object) GetType() string {
+	return (*o)["type"].(string)
+}
+
 func (o *Object) GetPublished() string {
 	return (*o)["published"].(string)
 }
@@ -52,7 +56,11 @@ func (o *Object) SetAttributedTo(actor string) {
 }
 
 func (o *Object) GetInReplyTo() string {
-	return (*o)["inReplyTo"].(string)
+	s, ok := (*o)["inReplyTo"].(string)
+	if !ok {
+		return ""
+	}
+	return s
 }
 
 func (o *Object) GetTag() []map[string]string {
