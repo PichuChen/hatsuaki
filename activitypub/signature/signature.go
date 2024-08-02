@@ -156,7 +156,11 @@ func Pubout(privateKeyPem []byte) []byte {
 	}
 
 	// encode to pem
-	keyBytes := x509.MarshalPKCS1PublicKey(&key.(*rsa.PrivateKey).PublicKey)
+	keyBytes, err := x509.MarshalPKIXPublicKey(key.(*rsa.PrivateKey).Public())
+	if err != nil {
+		slog.Error("Failed to marshal public key", "Error", err)
+		return nil
+	}
 
 	return pem.EncodeToMemory(&pem.Block{
 		Type:  "PUBLIC KEY",
@@ -178,7 +182,7 @@ func GeneratePrivateKey() string {
 	}
 
 	return string(pem.EncodeToMemory(&pem.Block{
-		Type:  "RSA PRIVATE KEY",
+		Type:  "PRIVATE KEY",
 		Bytes: keyBytes,
 	}))
 }
