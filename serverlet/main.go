@@ -39,6 +39,17 @@ func main() {
 	} else if err != nil {
 		slog.Error("main", "error", err)
 	}
+	if config.GetDomain() == "" {
+		slog.Error("main", "error", "domain is empty")
+	}
+	if config.GetDomain() == "example.com" {
+		slog.Error("main", "error", "please change the domain in config.json (domain == example.com)")
+	}
+	if config.GetListenAddress() == "" {
+		slog.Warn("main", "warn", "listen_address is empty, setting to :8083")
+		config.SetListenAddress(":8083")
+		config.SaveConfig("./config.json")
+	}
 
 	if config.GetLoginJWTSecret() == "" {
 		// 產生 256bit 的隨機字串
@@ -102,7 +113,7 @@ func main() {
 	})
 	// 這裡的 Route 是在 route.go 中定義的函數
 
-	// 在這邊已明文聆聽 HTTP 埠口 8080
-	http.ListenAndServe("0.0.0.0:8083", mux)
+	// 在這邊已明文聆聽 HTTP 埠口 8083
+	http.ListenAndServe(config.GetListenAddress(), mux)
 
 }
