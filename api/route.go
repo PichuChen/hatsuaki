@@ -4,15 +4,28 @@ import (
 	"encoding/json"
 	"log/slog"
 	"net/http"
+	"strings"
 
 	"github.com/pichuchen/hatsuaki/activitypub"
 	"github.com/pichuchen/hatsuaki/datastore/actor"
 	"github.com/pichuchen/hatsuaki/datastore/object"
+
+	"github.com/pichuchen/hatsuaki/api/auth"
+	"github.com/pichuchen/hatsuaki/api/timeline"
 )
 
 func Route(w http.ResponseWriter, r *http.Request) {
+	if strings.HasPrefix(r.URL.Path, "/1/user") {
+		RouteUser(w, r)
+		return
+	}
+	if strings.HasPrefix(r.URL.Path, "/1/timeline") {
+		timeline.RouteTimeline(w, r)
+		return
+	}
+
 	if r.Method == "GET" {
-		RouteGet(w, r)
+		http.Error(w, "Method Not Allowed", http.StatusMethodNotAllowed)
 		return
 	} else if r.Method == "POST" {
 		RoutePost(w, r)
@@ -20,10 +33,6 @@ func Route(w http.ResponseWriter, r *http.Request) {
 	}
 	http.Error(w, "Method Not Allowed", http.StatusMethodNotAllowed)
 
-}
-
-func RouteGet(w http.ResponseWriter, r *http.Request) {
-	http.Error(w, "Method Not Allowed", http.StatusMethodNotAllowed)
 }
 
 func RoutePost(w http.ResponseWriter, r *http.Request) {
@@ -108,7 +117,7 @@ func PostLogin(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	token, err := IssueJWT(username)
+	token, err := auth.IssueJWT(username)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
@@ -126,14 +135,14 @@ func PostLogin(w http.ResponseWriter, r *http.Request) {
 func PostNote(w http.ResponseWriter, r *http.Request) {
 	slog.Info("api.PostPost", "info", "post")
 
-	auth := r.Header.Get("Authorization")
-	if auth == "" {
+	authHdr := r.Header.Get("Authorization")
+	if authHdr == "" {
 		http.Error(w, "Unauthorized", http.StatusUnauthorized)
 		return
 	}
 
-	token := auth[len("Bearer "):]
-	username, err := VerifyJWT(token)
+	token := authHdr[len("Bearer "):]
+	username, err := auth.VerifyJWT(token)
 	if err != nil {
 		http.Error(w, "Unauthorized", http.StatusUnauthorized)
 		return

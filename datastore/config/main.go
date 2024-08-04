@@ -12,6 +12,8 @@ type Config struct {
 	LoginJWTSecret string `json:"login_jwt_secret"`
 	// The Accept or Reject MAY be generated automatically - https://www.w3.org/TR/activitypub/#follow-activity-inbox
 	EnableAutoAcceptFollow bool `json:"enable_auto_accept_follow"`
+	// Invite Code 如果有被設定的話，則需要透過這個 Invite Code 才能註冊
+	InviteCode string `json:"invite_code"`
 }
 
 var runningConfig Config
@@ -42,6 +44,14 @@ func GetEnableAutoAcceptFollow() bool {
 
 func SetEnableAutoAcceptFollow(b bool) {
 	runningConfig.EnableAutoAcceptFollow = b
+}
+
+func GetInviteCode() string {
+	return runningConfig.InviteCode
+}
+
+func SetInviteCode(code string) {
+	runningConfig.InviteCode = code
 }
 
 func LoadConfig(filepath string) error {
